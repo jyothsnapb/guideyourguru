@@ -1,113 +1,67 @@
-let selectedProfessor = '';
-let selectedDepartment = '';
-let selectedUniversity = '';
-let rating = 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor Review</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Professor Review Platform</h1>
+        <div class="search-bar">
+            <input type="text" id="professorSearch" placeholder="Search for a professor by university..." oninput="filterProfessors()">
+        </div>
+        <ul id="professorList">
+            <li onclick="viewProfessorDetail('Professor A')">
+                <span class="professor-name">Professor A</span> - 
+                <span class="department">Computer Science</span>, 
+                <span class="university">University A</span>
+            </li>
+            <li onclick="viewProfessorDetail('Professor B')">
+                <span class="professor-name">Professor B</span> - 
+                <span class="department">Mathematics</span>, 
+                <span class="university">University B</span>
+            </li>
+            <li onclick="viewProfessorDetail('Professor C')">
+                <span class="professor-name">Professor C</span> - 
+                <span class="department">Physics</span>, 
+                <span class="university">University C</span>
+            </li>
+        </ul>
+    </div>
 
-// Example data for professors and reviews
-const professors = {
-    "Professor A": {
-        department: "Computer Science",
-        university: "University A",
-        reviews: [
-            { name: "John Doe", date: "2024-08-01", rating: 4, title: "Great Professor!", description: "Professor A is very knowledgeable and helpful." },
-            { name: "Jane Smith", date: "2024-07-30", rating: 5, title: "Excellent Teaching", description: "The lectures are clear and concise." }
-        ]
-    },
-    "Professor B": {
-        department: "Mathematics",
-        university: "University B",
-        reviews: [
-            { name: "Alice Johnson", date: "2024-07-28", rating: 3, title: "Average", description: "Decent professor, but could improve in explaining complex topics." }
-        ]
-    },
-    "Professor C": {
-        department: "Physics",
-        university: "University C",
-        reviews: [
-            { name: "Bob Brown", date: "2024-08-01", rating: 5, title: "Fantastic!", description: "Professor C makes learning physics fun and engaging." }
-        ]
-    }
-};
+    <div id="professorDetail" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="professorName"></h2>
+            <p id="professorDepartment"></p>
+            <p id="professorUniversity"></p>
+            <button onclick="openReviewForm()">Add Review</button>
+            <h3>Existing Reviews:</h3>
+            <div id="reviewsList" class="reviews-list">
+                <!-- Reviews will be listed here -->
+            </div>
+        </div>
+    </div>
 
-function filterProfessors() {
-    const searchInput = document.getElementById('professorSearch').value.toLowerCase();
-    const professorsList = document.querySelectorAll('#professorList li');
-    professorsList.forEach(professor => {
-        if (professor.textContent.toLowerCase().includes(searchInput)) {
-            professor.style.display = '';
-        } else {
-            professor.style.display = 'none';
-        }
-    });
-}
+    <div id="reviewForm" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReviewForm()">&times;</span>
+            <h2>Add Review for <span id="reviewProfessorName"></span></h2>
+            <div class="rating">
+                <span onclick="rateProfessor(1)">&#9733;</span>
+                <span onclick="rateProfessor(2)">&#9733;</span>
+                <span onclick="rateProfessor(3)">&#9733;</span>
+                <span onclick="rateProfessor(4)">&#9733;</span>
+                <span onclick="rateProfessor(5)">&#9733;</span>
+            </div>
+            <input type="text" id="reviewTitle" placeholder="Review Title">
+            <textarea id="reviewDescription" placeholder="Write your review here..."></textarea>
+            <button onclick="submitReview()">Submit Review</button>
+        </div>
+    </div>
 
-function viewProfessorDetail(name) {
-    const professor = professors[name];
-    selectedProfessor = name;
-    selectedDepartment = professor.department;
-    selectedUniversity = professor.university;
-    document.getElementById('professorName').textContent = name;
-    document.getElementById('professorDepartment').textContent = professor.department;
-    document.getElementById('professorUniversity').textContent = professor.university;
-    document.getElementById('professorDetail').style.display = 'block';
-
-    // Load existing reviews
-    const reviewsList = document.getElementById('reviewsList');
-    reviewsList.innerHTML = '';
-    professor.reviews.forEach(review => {
-        const reviewElement = document.createElement('div');
-        reviewElement.className = 'review';
-        reviewElement.innerHTML = `
-            <p><strong>${review.name}</strong> (${review.date})</p>
-            <p>Rating: ${'&#9733;'.repeat(review.rating)}${'&#9734;'.repeat(5 - review.rating)}</p>
-            <p><strong>${review.title}</strong></p>
-            <p>${review.description}</p>
-        `;
-        reviewsList.appendChild(reviewElement);
-    });
-}
-
-function closeModal() {
-    document.getElementById('professorDetail').style.display = 'none';
-}
-
-function openReviewForm() {
-    document.getElementById('reviewProfessorName').textContent = selectedProfessor;
-    document.getElementById('reviewForm').style.display = 'block';
-}
-
-function closeReviewForm() {
-    document.getElementById('reviewForm').style.display = 'none';
-}
-
-function rateProfessor(stars) {
-    rating = stars;
-    const starsElements = document.querySelectorAll('.rating span');
-    starsElements.forEach((star, index) => {
-        if (index < stars) {
-            star.style.color = 'gold';
-        } else {
-            star.style.color = '';
-        }
-    });
-}
-
-function submitReview() {
-    const reviewTitle = document.getElementById('reviewTitle').value;
-    const reviewDescription = document.getElementById('reviewDescription').value;
-    if (selectedProfessor && reviewTitle && reviewDescription && rating) {
-        const review = {
-            name: 'Anonymous', // You can modify this to capture the actual reviewer's name
-            date: new Date().toISOString().split('T')[0],
-            rating: rating,
-            title: reviewTitle,
-            description: reviewDescription
-        };
-        professors[selectedProfessor].reviews.push(review);
-        alert(`Review submitted for ${selectedProfessor} with rating ${rating} stars:\nTitle: ${reviewTitle}\nDescription: ${reviewDescription}`);
-        closeReviewForm();
-        viewProfessorDetail(selectedProfessor); // Refresh the professor details to show the new review
-    } else {
-        alert('Please fill out all fields and rate the professor before submitting.');
-    }
-}
+    <script src="script.js"></script>
+</body>
+</html>
